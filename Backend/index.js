@@ -11,6 +11,7 @@ import {
   getChatHistory,
   clearChatHistory,
 } from "./ollamaHandler.js";
+import { answerQuery } from "./queryProcessor.js";
 import fs from "fs";
 
 dotenv.config();
@@ -101,7 +102,70 @@ initializePinecone()
       }
     });
 
+    app.post("/api/chat/test", async (req, res) => {
+      try {
+        const { message } = req.body;
+
+        // Use the new unified pipeline
+        const response = await answerQuery(message);
+
+        // res.json({
+        //   response,
+        //   originalQuery: message,
+        // });
+
+        res.json({
+          reply: response.trim(),
+          // responseId: responseId,
+        });
+      } catch (error) {
+        console.error("API error:", error);
+        res.status(500).json({ error: "Failed to process request" });
+      }
+    });
+
+    // app.post("/api/chat/test", async (req, res) => {
+    //   try {
+    //     const { message } = req.body;
+
+    //     // Preprocess and improve the query
+    //     const processedQuery = preprocessQuery(message);
+    //     const improvedQuery = await improveQuery(processedQuery);
+
+    //     // Get embeddings for the improved query
+    //     const queryEmbedding = await getEmbeddings(improvedQuery);
+
+    //     // Search Pinecone for relevant documents
+    //     const results = await vectorStore.similaritySearchWithScore(
+    //       improvedQuery,
+    //       5
+    //     );
+    //     const retrievedDocs = results.map(([doc]) => doc);
+
+    //     // Rerank the results
+    //     const rerankedDocs = await rerankResults(improvedQuery, retrievedDocs);
+
+    //     // Generate response using reranked documents
+    //     const response = await generateHumanResponse(
+    //       improvedQuery,
+    //       rerankedDocs
+    //     );
+
+    //     res.json({
+    //       response,
+    //       originalQuery: message,
+    //       improvedQuery,
+    //       context: rerankedDocs.map((doc) => doc.pageContent).join("\n\n"),
+    //       embedding: queryEmbedding,
+    //     });
+    //   } catch (error) {
+    //     console.error("API error:", error);
+    //     res.status(500).json({ error: "Failed to process request" });
+    //   }
+    // });
+
     // Main chat endpoint
+
     app.post("/api/chat", async (req, res) => {
       try {
         const { message, chatId } = req.body;
@@ -181,10 +245,13 @@ initializePinecone()
           });
         } catch (pineErr) {
           console.error("Pinecone search error:", pineErr);
-          return res.status(500).json({ error: "Pinecone search failed", details: pineErr.message || pineErr });
+          return res.status(500).json({
+            error: "Pinecone search failed",
+            details: pineErr.message || pineErr,
+          });
         }
 
-        const context = docs.map(d => d.pageContent).join("\n\n");
+        const context = docs.map((d) => d.pageContent).join("\n\n");
         console.log("\nCombined context being sent to AI:", context);
 
         let response;
@@ -192,7 +259,10 @@ initializePinecone()
           response = await ollama.chat({
             model: MODEL,
             messages: [
-              { role: "system", content: "You are a travel-planning assistant." },
+              {
+                role: "system",
+                content: "You are a travel-planning assistant.",
+              },
               { role: "system", content: `Context:\n${context}` },
               { role: "user", content: message },
             ],
@@ -201,7 +271,10 @@ initializePinecone()
           console.log("\nAI Response:", response.message.content.trim());
         } catch (ollamaErr) {
           console.error("Ollama chat error:", ollamaErr);
-          return res.status(500).json({ error: "Ollama chat failed", details: ollamaErr.message || ollamaErr });
+          return res.status(500).json({
+            error: "Ollama chat failed",
+            details: ollamaErr.message || ollamaErr,
+          });
         }
 
         console.log("=== END PINEONE DATA RETRIEVAL ===\n");
@@ -210,13 +283,16 @@ initializePinecone()
         const elapsed = Date.now() - startTime;
         console.log(`Request processed in ${elapsed}ms`);
 
-        res.json({ 
+        res.json({
           reply: response.message.content.trim(),
-          responseId: responseId
+          responseId: responseId,
         });
       } catch (error) {
         console.error("API error (outer catch):", error);
-        res.status(500).json({ error: "Failed to process request", details: error.message || error });
+        res.status(500).json({
+          error: "Failed to process request",
+          details: error.message || error,
+        });
       }
     });
 
@@ -224,10 +300,10 @@ initializePinecone()
     app.post("/api/feedback", (req, res) => {
       try {
         const { responseId, rating, comment, location } = req.body;
-        
+
         if (!responseId || !rating) {
-          return res.status(400).json({ 
-            error: "responseId and rating are required" 
+          return res.status(400).json({
+            error: "responseId and rating are required",
           });
         }
 
@@ -237,15 +313,15 @@ initializePinecone()
           rating,
           comment: comment || "",
           location: location || "",
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         };
 
         feedbackStore.push(feedback);
         console.log("New feedback received:", feedback);
 
-        res.json({ 
+        res.json({
           message: "Feedback received successfully",
-          feedback 
+          feedback,
         });
       } catch (error) {
         console.error("Error saving feedback:", error);
@@ -268,7 +344,7 @@ initializePinecone()
       try {
         const { location } = req.params;
         const locationFeedback = feedbackStore.filter(
-          f => f.location.toLowerCase() === location.toLowerCase()
+          (f) => f.location.toLowerCase() === location.toLowerCase()
         );
         res.json({ feedback: locationFeedback });
       } catch (error) {
@@ -278,21 +354,27 @@ initializePinecone()
     });
 
     // Add this new endpoint
-    app.get('/test-results', (req, res) => {
-        try {
-            const results = JSON.parse(fs.readFileSync('test_results.csv', 'utf8'));
-            
-            // Calculate summary statistics
-            const summary = {
-                avgAccuracy: results.reduce((acc, curr) => acc + curr.accuracy_score, 0) / results.length,
-                avgRelevance: results.reduce((acc, curr) => acc + curr.relevance_score, 0) / results.length,
-                overallScore: results.reduce((acc, curr) => acc + curr.overall_score, 0) / results.length
-            };
+    app.get("/test-results", (req, res) => {
+      try {
+        const results = JSON.parse(fs.readFileSync("test_results.csv", "utf8"));
 
-            res.json({ results, summary });
-        } catch (error) {
-            res.status(500).json({ error: 'Failed to read test results' });
-        }
+        // Calculate summary statistics
+        const summary = {
+          avgAccuracy:
+            results.reduce((acc, curr) => acc + curr.accuracy_score, 0) /
+            results.length,
+          avgRelevance:
+            results.reduce((acc, curr) => acc + curr.relevance_score, 0) /
+            results.length,
+          overallScore:
+            results.reduce((acc, curr) => acc + curr.overall_score, 0) /
+            results.length,
+        };
+
+        res.json({ results, summary });
+      } catch (error) {
+        res.status(500).json({ error: "Failed to read test results" });
+      }
     });
 
     const PORT = process.env.PORT || 8000;

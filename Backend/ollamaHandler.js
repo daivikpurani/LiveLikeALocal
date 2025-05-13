@@ -1,5 +1,5 @@
 import { Ollama } from "ollama";
-import { pipeline } from "@xenova/transformers";
+import OpenAI from "openai";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -9,32 +9,27 @@ const ollama = new Ollama({
   host: process.env.OLLAMA_HOST || "http://localhost:11434",
 });
 
-// Get model names from environment variables with defaults
-const EMBEDDING_MODEL =
-  process.env.EMBEDDING_MODEL || "Xenova/all-MiniLM-L6-v2";
-const CHAT_MODEL = process.env.OLLAMA_CHAT_MODEL || "llama3.2";
+// Initialize OpenAI client
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
-// Initialize the embedding pipeline
-let embeddingPipeline = null;
+// Get model names from environment variables with defaults
+const EMBEDDING_MODEL = "text-embedding-ada-002";
+const CHAT_MODEL = process.env.OLLAMA_CHAT_MODEL || "llama3.2";
 
 // Store chat histories
 const chatHistories = new Map();
 
-// Function to get embeddings using transformers
+// Function to get embeddings using OpenAI
 export async function getEmbeddings(text) {
   try {
-    // Initialize pipeline if not already done
-    if (!embeddingPipeline) {
-      embeddingPipeline = await pipeline("feature-extraction", EMBEDDING_MODEL);
-    }
-
-    // Get embeddings
-    const result = await embeddingPipeline(text, {
-      pooling: "mean",
-      normalize: true,
+    const response = await openai.embeddings.create({
+      model: EMBEDDING_MODEL,
+      input: text,
     });
 
-    return Array.from(result.data);
+    return response.data[0].embedding;
   } catch (error) {
     console.error("Error getting embeddings:", error);
     throw error;
@@ -80,7 +75,7 @@ export async function getChatResponse(prompt, context = "", chatHistory = []) {
 // Function to process a query with context and chat history
 export async function processQuery(query, context = "", chatId = null) {
   try {
-    // Get embeddings for the query using transformers
+    // Get embeddings for the query using OpenAI
     const queryEmbedding = await getEmbeddings(query);
 
     // Get or initialize chat history

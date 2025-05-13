@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css"; // Assuming your CSS is in App.css
 import Feedback from "./components/Feedback";
-import TestResults from './components/TestResults';
+import TestResults from "./components/TestResults";
+import ReactMarkdown from "react-markdown";
 
 const Message = ({ content, role, timestamp }) => {
   const formattedTime = new Date(timestamp).toLocaleTimeString([], {
@@ -11,7 +12,13 @@ const Message = ({ content, role, timestamp }) => {
 
   return (
     <div className={`message ${role}`}>
-      <div className="message-content">{content}</div>
+      <div className="message-content">
+        {role === "assistant" ? (
+          <ReactMarkdown>{content}</ReactMarkdown>
+        ) : (
+          content
+        )}
+      </div>
       <div className="message-timestamp">{formattedTime}</div>
     </div>
   );
@@ -125,7 +132,8 @@ export default function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8000/api/travel-chat", {
+      // const response = await fetch("http://localhost:8000/api/travel-chat", {
+      const response = await fetch("http://localhost:8000/api/chat/test", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -138,15 +146,16 @@ export default function App() {
       const data = await response.json();
 
       // Extract location from the message if it's a travel query
-      const locationMatch = inputText.match(/visit\s+([^,.]+)/i) || 
-                          inputText.match(/go\s+to\s+([^,.]+)/i) ||
-                          inputText.match(/travel\s+to\s+([^,.]+)/i) ||
-                          inputText.match(/in\s+([^,.]+)/i) ||
-                          inputText.match(/at\s+([^,.]+)/i);
+      const locationMatch =
+        inputText.match(/visit\s+([^,.]+)/i) ||
+        inputText.match(/go\s+to\s+([^,.]+)/i) ||
+        inputText.match(/travel\s+to\s+([^,.]+)/i) ||
+        inputText.match(/in\s+([^,.]+)/i) ||
+        inputText.match(/at\s+([^,.]+)/i);
       const location = locationMatch ? locationMatch[1].trim() : null;
-      
-      console.log('Response ID:', data.responseId);
-      console.log('Location:', location);
+
+      console.log("Response ID:", data.responseId);
+      console.log("Location:", location);
 
       const assistantMessage = {
         content: data.reply || "No response received",
@@ -160,7 +169,8 @@ export default function App() {
     } catch (error) {
       console.error("Error sending message:", error);
       const errorMessage = {
-        content: "Sorry, there was an error processing your message. Please try again.",
+        content:
+          "Sorry, there was an error processing your message. Please try again.",
         role: "assistant",
         timestamp: new Date().toISOString(),
       };
@@ -194,7 +204,8 @@ export default function App() {
       <div className="chat-container">
         <div className="chat-header">
           <h1>
-            {chats.find((chat) => chat.id === activeChatId)?.title || "New Chat"}
+            {chats.find((chat) => chat.id === activeChatId)?.title ||
+              "New Chat"}
           </h1>
         </div>
         <div className="messages-container">
