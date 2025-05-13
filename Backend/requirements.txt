@@ -1,0 +1,19 @@
+# Core Dependencies
+flask>=2.0.0
+python-dotenv>=1.0.0
+openai>=1.3.0
+pandas>=2.0.0
+numpy>=1.23.0
+
+# LLM Evaluation
+trulens-eval>=1.4.9
+scikit-learn>=1.3.0
+nltk>=3.9.1
+
+# API and Web
+requests>=2.31.0
+flask-cors>=4.0.0
+
+# Utilities
+python-dateutil>=2.8.2
+pytz>=2024.1

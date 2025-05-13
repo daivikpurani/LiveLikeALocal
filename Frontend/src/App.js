@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "./App.css"; // Assuming your CSS is in App.css
 import Feedback from "./components/Feedback";
+import TestResults from './components/TestResults';
 
 const Message = ({ content, role, timestamp }) => {
   const formattedTime = new Date(timestamp).toLocaleTimeString([], {

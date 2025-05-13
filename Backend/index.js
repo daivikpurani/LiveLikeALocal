@@ -11,6 +11,7 @@ import {
   getChatHistory,
   clearChatHistory,
 } from "./ollamaHandler.js";
+import fs from "fs";
 
 dotenv.config();
 const MODEL = process.env.OLLAMA_MODEL || "llama3";
@@ -164,45 +165,58 @@ initializePinecone()
 
     // New travel planning endpoint
     app.post("/api/travel-chat", async (req, res) => {
+      const startTime = Date.now();
       try {
         const { message } = req.body;
         console.log("\n=== PINEONE DATA RETRIEVAL ===");
         console.log("Searching Pinecone for:", message);
 
-        // Search Pinecone for relevant documents
-        const docs = await vectorStore.similaritySearch(message, 3);
-        console.log("\nRetrieved documents from Pinecone:");
-        docs.forEach((doc, index) => {
-          console.log(`\nDocument ${index + 1}:`);
-          console.log(doc.pageContent);
-        });
+        let docs;
+        try {
+          docs = await vectorStore.similaritySearch(message, 3);
+          console.log("\nRetrieved documents from Pinecone:");
+          docs.forEach((doc, index) => {
+            console.log(`\nDocument ${index + 1}:`);
+            console.log(doc.pageContent);
+          });
+        } catch (pineErr) {
+          console.error("Pinecone search error:", pineErr);
+          return res.status(500).json({ error: "Pinecone search failed", details: pineErr.message || pineErr });
+        }
 
         const context = docs.map(d => d.pageContent).join("\n\n");
         console.log("\nCombined context being sent to AI:", context);
 
-        const response = await ollama.chat({
-          model: MODEL,
-          messages: [
-            { role: "system", content: "You are a travel-planning assistant." },
-            { role: "system", content: `Context:\n${context}` },
-            { role: "user", content: message },
-          ],
-          options: { temperature: 0.7 },
-        });
+        let response;
+        try {
+          response = await ollama.chat({
+            model: MODEL,
+            messages: [
+              { role: "system", content: "You are a travel-planning assistant." },
+              { role: "system", content: `Context:\n${context}` },
+              { role: "user", content: message },
+            ],
+            options: { temperature: 0.7 },
+          });
+          console.log("\nAI Response:", response.message.content.trim());
+        } catch (ollamaErr) {
+          console.error("Ollama chat error:", ollamaErr);
+          return res.status(500).json({ error: "Ollama chat failed", details: ollamaErr.message || ollamaErr });
+        }
 
-        console.log("\nAI Response:", response.message.content.trim());
         console.log("=== END PINEONE DATA RETRIEVAL ===\n");
-
-        // Generate a unique ID for this response
         const responseId = Date.now().toString();
+
+        const elapsed = Date.now() - startTime;
+        console.log(`Request processed in ${elapsed}ms`);
 
         res.json({ 
           reply: response.message.content.trim(),
-          responseId: responseId // Include the ID in the response
+          responseId: responseId
         });
       } catch (error) {
-        console.error("API error:", error);
-        res.status(500).json({ error: "Failed to process request" });
+        console.error("API error (outer catch):", error);
+        res.status(500).json({ error: "Failed to process request", details: error.message || error });
       }
     });
 
@@ -261,6 +275,24 @@ initializePinecone()
         console.error("Error retrieving location feedback:", error);
         res.status(500).json({ error: "Failed to retrieve location feedback" });
       }
+    });
+
+    // Add this new endpoint
+    app.get('/test-results', (req, res) => {
+        try {
+            const results = JSON.parse(fs.readFileSync('test_results.csv', 'utf8'));
+            
+            // Calculate summary statistics
+            const summary = {
+                avgAccuracy: results.reduce((acc, curr) => acc + curr.accuracy_score, 0) / results.length,
+                avgRelevance: results.reduce((acc, curr) => acc + curr.relevance_score, 0) / results.length,
+                overallScore: results.reduce((acc, curr) => acc + curr.overall_score, 0) / results.length
+            };
+
+            res.json({ results, summary });
+        } catch (error) {
+            res.status(500).json({ error: 'Failed to read test results' });
+        }
     });
 
     const PORT = process.env.PORT || 8000;
