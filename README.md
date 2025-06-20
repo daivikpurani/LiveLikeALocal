@@ -1,20 +1,20 @@
-# LiveLikeALocal: Interdisciplinary Collaboration Assistant
+# San Francisco Travel Itinerary Creator
 
 ## 🌟 Project Overview
 
-**LiveLikeALocal** is an innovative AI-powered chatbot system designed to facilitate seamless collaboration between Computer Science and Biology teams working on DNA-related projects. This interdisciplinary assistant bridges knowledge gaps, translates domain-specific terminology, and helps team members understand concepts outside their expertise through intelligent conversation and context-aware responses.
+**San Francisco Travel Itinerary Creator** is an intelligent AI-powered travel assistant that generates personalized itineraries and recommendations for visitors to San Francisco. This sophisticated system combines natural language processing, vector search, and local knowledge to create tailored travel experiences based on user preferences, interests, and requirements.
 
 ### 🎯 Primary Mission
 
-The system serves as a sophisticated bridge between two complex domains:
-- **Computer Science**: Algorithms, data structures, machine learning, software engineering
-- **Biology**: DNA structures, genetic processes, molecular biology, genomic data
-
-By providing real-time translation and contextual understanding, LiveLikeALocal enables more effective interdisciplinary collaboration, reducing communication barriers and accelerating scientific discovery.
+The system serves as a comprehensive travel planning companion that:
+- **Understands User Preferences**: Analyzes interests, budget, accessibility needs, and travel style
+- **Generates Personalized Itineraries**: Creates day-by-day plans with activities, dining, and attractions
+- **Provides Local Insights**: Offers authentic recommendations beyond typical tourist spots
+- **Adapts to Different Travelers**: Caters to families, solo travelers, business visitors, and adventure seekers
 
 ## 🏗️ Architecture Overview
 
-The project follows a modern, scalable architecture with three main components:
+The project follows a modern, AI-driven architecture with three main components:
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
@@ -24,66 +24,73 @@ The project follows a modern, scalable architecture with three main components:
 │ • Chat UI       │    │ • Express API   │    │ • Web Scraping  │
 │ • Real-time     │    │ • Ollama LLM    │    │ • Data Cleaning │
 │   Messaging     │    │ • Pinecone DB   │    │ • Vector Store  │
-│ • Chat History  │    │ • Embeddings    │    │   Population    │
+│ • Markdown      │    │ • OpenAI API    │    │   Population    │
+│   Rendering     │    │ • Intent        │    │ • Event Data    │
+│                 │    │   Classification│    │   Processing    │
 └─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
 ### 🔧 Technology Stack
 
 #### Frontend
-- **React.js 19.0.0** - Modern UI framework
-- **CSS3** - Styling and responsive design
-- **Web Vitals** - Performance monitoring
+- **React.js 19.0.0** - Modern UI framework with real-time updates
+- **React Markdown** - Rich text rendering for formatted itineraries
+- **CSS3** - Responsive design and modern styling
+- **Axios** - HTTP client for API communication
 
 #### Backend
-- **Node.js** - Server runtime
-- **Express.js** - Web framework
-- **Ollama** - Local LLM integration
-- **Pinecone** - Vector database
-- **Transformers.js** - Embedding generation
+- **Node.js** - Server runtime with Express.js framework
+- **Ollama** - Local LLM integration for response generation
+- **OpenAI API** - Embedding generation and intent classification
+- **Pinecone** - Vector database for semantic search
+- **LangChain** - LLM orchestration and prompt management
 - **CORS** - Cross-origin resource sharing
 
 #### Data Processing
-- **Python** - Data scraping and processing
-- **BeautifulSoup** - Web scraping
-- **LangChain** - LLM orchestration
-- **Sentence Transformers** - Text embeddings
+- **Python** - Data scraping and processing pipeline
+- **BeautifulSoup** - Web scraping from SF event websites
+- **CSV Processing** - User persona and test data management
+- **Vector Embeddings** - Semantic search capabilities
 
 ## 🚀 Key Features
 
-### 🤖 Intelligent Conversation
-- **Context-Aware Responses**: Leverages retrieved documents and chat history
-- **Domain Translation**: Converts technical concepts between CS and Biology
-- **Multi-turn Conversations**: Maintains conversation context across sessions
-- **Real-time Processing**: Instant responses with typing indicators
+### 🤖 Intelligent Itinerary Generation
+- **Context-Aware Recommendations**: Leverages user preferences and local knowledge
+- **Multi-Day Planning**: Creates comprehensive day-by-day itineraries
+- **Category-Based Filtering**: Activities, dining, attractions, and events
+- **Real-time Processing**: Instant itinerary generation with typing indicators
 
-### 🔍 Advanced Search & Retrieval
-- **Semantic Search**: Uses embeddings for contextually relevant document retrieval
+### 🔍 Advanced Search & Discovery
+- **Semantic Search**: Uses embeddings for contextually relevant recommendations
+- **Intent Classification**: Understands user queries and preferences
 - **Vector Database**: Pinecone integration for efficient similarity search
-- **Document Context**: Provides relevant background information for responses
+- **Local Knowledge Base**: Comprehensive SF event and location data
 
-### 💾 Persistent Chat Management
-- **Chat Sessions**: Multiple concurrent chat sessions
-- **History Persistence**: Maintains conversation history across sessions
-- **Session Management**: Start, load, and clear chat sessions
+### 💾 Personalized Experience
+- **User Personas**: 100+ detailed traveler profiles with preferences
+- **Preference Learning**: Adapts recommendations based on user interactions
+- **Chat History**: Maintains conversation context across sessions
+- **Session Management**: Multiple concurrent planning sessions
 
-### 🎨 Modern User Interface
+### 🎨 Rich User Interface
+- **Markdown Rendering**: Beautifully formatted itineraries with headers and sections
 - **Responsive Design**: Works across desktop and mobile devices
 - **Real-time Updates**: Live message streaming and status updates
-- **Intuitive Navigation**: Sidebar chat management and easy switching
 - **Professional Styling**: Clean, modern interface design
 
 ## 📁 Project Structure
 
 ```
-LiveLikeALocal/
+San Francisco Travel Itinerary Creator/
 ├── Backend/                    # Node.js server application
 │   ├── index.js               # Main server entry point
-│   ├── ollamaHandler.js       # LLM interaction logic
+│   ├── queryProcessor.js      # Core itinerary generation logic
+│   ├── ollamaHandler.js       # LLM interaction handling
 │   ├── pinecone.js            # Vector database configuration
 │   ├── package.json           # Node.js dependencies
-│   ├── Initialprompt.md       # System prompt configuration
-│   ├── graduate seminar (2).ipynb  # Development notebook
+│   ├── test_queries.csv       # Test query dataset
+│   ├── sf_users_personas.csv  # User persona database
+│   ├── test_results.csv       # Evaluation results
 │   └── test-*.js              # Test files for various components
 │
 ├── Frontend/                   # React.js client application
@@ -91,13 +98,15 @@ LiveLikeALocal/
 │   │   ├── App.js             # Main React component
 │   │   ├── App.css            # Application styling
 │   │   └── components/        # Reusable UI components
+│   │       ├── Feedback.js    # User feedback component
+│   │       └── TestResults.js # Results display component
 │   ├── public/                # Static assets
 │   └── package.json           # React dependencies
 │
 ├── Data Scraping/             # Python data processing pipeline
-│   ├── datasetscript.py       # Web scraping script
+│   ├── datasetscript.py       # Web scraping from SF event sites
 │   ├── cleaneddata.py         # Data cleaning utilities
-│   └── output.txt             # Scraped data output
+│   └── output.txt             # Scraped event data
 │
 └── README.md                  # This documentation
 ```
@@ -109,13 +118,14 @@ LiveLikeALocal/
 - **Node.js** (v18 or higher)
 - **Python** (v3.8 or higher)
 - **Ollama** (for local LLM)
+- **OpenAI API Key** (for embeddings and intent classification)
 - **Pinecone Account** (for vector database)
 
 ### Step 1: Clone the Repository
 
 ```bash
 git clone <repository-url>
-cd LiveLikeALocal
+cd "San Francisco Travel Itinerary Creator"
 ```
 
 ### Step 2: Backend Setup
@@ -135,14 +145,14 @@ Configure your `.env` file with the following variables:
 ```env
 # Ollama Configuration
 OLLAMA_HOST=http://localhost:11434
-OLLAMA_CHAT_MODEL=llama3.2
+OLLAMA_MODEL=llama3.2
+
+# OpenAI Configuration
+OPENAI_API_KEY=your_openai_api_key
 
 # Pinecone Configuration
 PINECONE_API_KEY=your_pinecone_api_key
 PINECONE_INDEX_NAME=your_index_name
-
-# Embedding Model
-EMBEDDING_MODEL=Xenova/all-MiniLM-L6-v2
 
 # Server Configuration
 PORT=8000
@@ -218,27 +228,27 @@ ollama pull llama3.2
 
 ## 🔧 Configuration
 
-### System Prompt Customization
+### Intent Classification
 
-The system behavior is controlled by the prompt in `Backend/Initialprompt.md`. This file contains the core instructions for the AI assistant, including:
-
-- Domain translation guidelines
-- Communication protocols
-- Knowledge bridging strategies
-- Project-specific context
-
-### Model Configuration
-
-You can customize the LLM and embedding models by modifying the environment variables:
-
-- `OLLAMA_CHAT_MODEL`: The chat model to use (default: llama3.2)
-- `EMBEDDING_MODEL`: The embedding model for semantic search (default: Xenova/all-MiniLM-L6-v2)
+The system uses OpenAI's GPT-3.5-turbo for intent classification, categorizing queries into:
+- `find-free` - Free activities and events
+- `find-category` - Specific activity categories
+- `find-date-range` - Time-based recommendations
+- `general` - General travel planning queries
 
 ### Vector Database Setup
 
 1. Create a Pinecone account at [pinecone.io](https://pinecone.io)
-2. Create a new index with appropriate dimensions for your embedding model
+2. Create a new index with 1536 dimensions (for OpenAI embeddings)
 3. Configure the index name and API key in your `.env` file
+
+### User Personas
+
+The system includes 100+ detailed user personas with:
+- Age demographics (21-70 years)
+- Activity preferences (parks, museums, nightlife, etc.)
+- Travel priorities (budget-friendly, luxury, family-oriented, etc.)
+- Accessibility needs and preferences
 
 ## 📊 API Endpoints
 
@@ -248,65 +258,67 @@ You can customize the LLM and embedding models by modifying the environment vari
 - `GET /api/chat/:chatId/history` - Retrieve chat history
 - `DELETE /api/chat/:chatId` - Clear chat history
 
-### Message Processing
+### Itinerary Generation
 
-- `POST /api/chat` - Process a message with context and history
-- `POST /api/local-chat` - Process a message without chat history
+- `POST /api/chat/test` - Generate personalized itinerary (main endpoint)
+- `POST /api/chat` - Process message with context and history
 
 ### Response Format
 
 ```json
 {
-  "response": "AI-generated response",
-  "chatHistory": [
-    {
-      "role": "user",
-      "content": "User message"
-    },
-    {
-      "role": "assistant", 
-      "content": "AI response"
-    }
-  ]
+  "reply": "Generated itinerary in markdown format",
+  "responseId": "unique_response_identifier"
 }
 ```
 
-## 🧪 Testing
+## 🧪 Testing & Evaluation
 
-The project includes comprehensive test files:
+The project includes comprehensive testing and evaluation:
 
-- `test-chat.js` - Chat functionality testing
-- `test-ollama.js` - Ollama integration testing
-- `test-embeddings.js` - Embedding generation testing
-- `test-endpoint.js` - API endpoint testing
+### Test Queries
+- `test_queries.csv` - 10 diverse travel planning queries
+- Covers different preferences, budgets, and travel styles
+
+### User Personas
+- `sf_users_personas.csv` - 100+ detailed traveler profiles
+- Includes age, preferences, and specific query examples
+
+### Evaluation Results
+- `test_results.csv` - Performance metrics and evaluation scores
+- `testEvaluator.js` - Automated evaluation system
+- `truLensEvaluator.py` - Advanced evaluation metrics
 
 Run tests with:
 ```bash
 cd Backend
-node test-chat.js
+node testEvaluator.js
 ```
 
 ## 🔍 Usage Examples
 
-### Starting a New Chat
+### Starting a New Travel Planning Session
 
 1. Open the application in your browser
 2. Click "New Chat" in the sidebar
-3. Begin typing your message
-4. The system will provide context-aware responses
+3. Describe your travel preferences and requirements
+4. Receive a personalized San Francisco itinerary
 
-### Interdisciplinary Questions
+### Sample Queries
 
-**Example 1 - CS to Biology Translation:**
+**Example 1 - Family Travel:**
 ```
-User: "How does a machine learning algorithm work for DNA sequence analysis?"
-Assistant: "Think of machine learning like teaching a computer to recognize patterns in DNA sequences, similar to how biologists identify genetic markers..."
+User: "I'm visiting San Francisco with my family next weekend. We have two kids (ages 8 and 12) and want to see some museums, parks, and maybe some kid-friendly activities. We're staying near Fisherman's Wharf."
 ```
 
-**Example 2 - Biology to CS Translation:**
+**Example 2 - Solo Business Traveler:**
 ```
-User: "What are the computational challenges of DNA sequencing errors?"
-Assistant: "DNA sequencing errors create data quality issues that require robust error correction algorithms, similar to how software handles corrupted data..."
+User: "I'm in San Francisco for a 3-day business trip. I want to experience the local food scene, maybe some wine tasting, and find good co-working spaces. I prefer trendy neighborhoods and authentic experiences."
+```
+
+**Example 3 - Budget Travel:**
+```
+User: "I'm a budget traveler looking for free or cheap activities in San Francisco. I love parks, street food, and meeting locals. I'm staying in a hostel near Mission District."
 ```
 
 ## 🤝 Contributing
@@ -321,20 +333,34 @@ Assistant: "DNA sequencing errors create data quality issues that require robust
 
 ### Key Implementation Details
 
-1. **Embedding Generation**: Uses Transformers.js for client-side embedding generation
-2. **Vector Search**: Implements semantic search using Pinecone vector database
-3. **Chat Persistence**: In-memory chat history management with session IDs
-4. **Error Handling**: Comprehensive error handling and user feedback
-5. **Performance**: Optimized for real-time conversation with minimal latency
+1. **Query Processing Pipeline**: 
+   - Preprocessing and intent classification
+   - Embedding generation with OpenAI
+   - Vector search with Pinecone
+   - LLM-based reranking and summarization
+
+2. **Itinerary Generation**:
+   - Context-aware response generation
+   - Markdown formatting for readability
+   - Time-based organization (Morning, Afternoon, Evening)
+   - Personalized recommendations
+
+3. **Data Management**:
+   - Comprehensive user persona database
+   - Event and location data from SF sources
+   - Vector embeddings for semantic search
+   - Real-time data processing
 
 ### Future Enhancements
 
-- [ ] Database persistence for chat history
-- [ ] User authentication and profiles
-- [ ] Advanced document processing pipeline
+- [ ] Integration with real-time event APIs
+- [ ] Weather-aware itinerary adjustments
 - [ ] Multi-language support
-- [ ] Integration with external knowledge bases
-- [ ] Real-time collaboration features
+- [ ] Mobile app development
+- [ ] Integration with booking platforms
+- [ ] Social features and sharing
+- [ ] Advanced personalization algorithms
+- [ ] Voice interface integration
 
 ## 📄 License
 
@@ -342,9 +368,10 @@ This project is licensed under the ISC License - see the LICENSE file for detail
 
 ## 🙏 Acknowledgments
 
+- **San Francisco Event Community** for local knowledge and data
 - **Ollama** for providing local LLM capabilities
+- **OpenAI** for embedding and classification services
 - **Pinecone** for vector database infrastructure
-- **Hugging Face** for embedding models and transformers
 - **React** and **Node.js** communities for excellent documentation
 
 ## 📞 Support
@@ -357,4 +384,4 @@ For questions, issues, or contributions, please:
 
 ---
 
-**LiveLikeALocal** - Bridging the gap between Computer Science and Biology through intelligent conversation. 🧬💻 
+**San Francisco Travel Itinerary Creator** - Your AI-powered companion for discovering the best of San Francisco! 🌉✨
